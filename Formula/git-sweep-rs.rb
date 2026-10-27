@@ -25,10 +25,22 @@ class GitSweepRs < Formula
       url "https://github.com/leo-yi/git-sweep-rs/releases/download/v1.0.2/git-sweep-rs-linux-x86_64-musl.tar.gz"
       sha256 "0918ebe255758f41592557249c0b2e055237682ada6925995565c2c32e5cedec"
     end
+
+    # 上游暂未提供 Linux arm64 预编译包，回退到源码构建
+    on_arm do
+      url "https://github.com/leo-yi/git-sweep-rs/archive/refs/tags/v1.0.2.tar.gz"
+      sha256 "77ce6f2c4b95e91e85d434c4c0e5489de0832d99cafc088c9c1cb0b04ec46388"
+
+      depends_on "rust" => :build
+    end
   end
 
   def install
-    bin.install "git-sweep-rs"
+    if OS.linux? && Hardware::CPU.arm?
+      system "cargo", "install", *std_cargo_args
+    else
+      bin.install "git-sweep-rs"
+    end
   end
 
   test do
